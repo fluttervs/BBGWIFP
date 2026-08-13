@@ -28,10 +28,13 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        # Use `npm install` (not `npm ci`): the lockfile was generated on
-        # Windows, and npm ci fails to install Linux-native binaries
-        # (npm/cli#4828 - missing @rollup/rollup-linux-x64-gnu).
-        run: npm install --no-audit --no-fund
+        # Remove the lockfile first: it was generated on Windows, so it only
+        # contains the Windows-native rollup binary. npm fails to install the
+        # Linux-native @rollup/rollup-linux-x64-gnu from it (npm/cli#4828).
+        # Regenerating fresh on Linux fixes the build.
+        run: |
+          rm -f package-lock.json
+          npm install --no-audit --no-fund
 
       - name: Build
         run: npm run build
